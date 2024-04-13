@@ -1,6 +1,6 @@
 ---
 title: "Final Project Report"
-author: "Your Name (NetID)"
+author: "Kyle Olcott (kto1) and Patricia Hashimoto (pch3)"
 jupyter: julia-1.10
 date: 2024-04-30
 
@@ -44,6 +44,18 @@ execute:
 
 Clearly define the problem statement that your chosen feature aims to address.
 Explain the significance of this problem in the context of climate risk management.
+
+This project will improve the model's ability to estimate the price to rebuild a home after flooding by accounting for more complex aspects of discount rate and price changes based on scarcity after a flood. 
+
+To obtain a more accurate understanding of cost over time, the discount rate will be broken down to have separate discount rates for the net present value calculation, the housing market, and the cost of labor and materials. Including these values will capture the way that different aspects of cost change over time in different ways; for example, perhaps inflation is higher for labor or materials. These factors will affect estimates of the cost to rebuild a house entirely from scratch. The discount rates, which may have different distributions or be constant, will be decided based on the findings of the literature review. 
+
+Additionally, the model will be modified to capture how scarcity caused by a flood affects construction cost. Including storm surge rating as a way to estimate the severity of the flood's impact of scarcity of materials and labor will enable the model to estimate the cost of rebuilding a house from scratch given scarcity.
+
+The components added to the model are illustrated in Figure 1.
+
+<!-- ![housing_cost_pipeline](house_cost_pipeline.png){width=80%} -->
+
+
 
 ## Selected Feature
 
