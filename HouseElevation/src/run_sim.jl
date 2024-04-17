@@ -30,6 +30,9 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
         depth_ft_gauge = storm_surges_ft .+ slr_ft # flood at gauge
         depth_ft_house = depth_ft_gauge .- (p.house.height_above_gauge_ft + a.Δh_ft) # flood @ house
         damages_frac = p.house.ddf.(depth_ft_house) ./ 100 # damage
+        # Implemented for scarcity modeling
+        demand_surge = 0.2 * damages_frac
+        damages_frac = damages_frac * (1+demand_surge)
         weighted_damages = damages_frac .* pdf_values # weighted damage
         # Trapezoidal integration of weighted damages
         ead = trapz(storm_surges_ft, weighted_damages) * p.house.value_usd

@@ -62,6 +62,8 @@ The components added to the model are illustrated in Figure 1.
 Describe the feature you have selected to add to the existing decision-support tool.
 Discuss how this feature relates to the problem statement and its potential to improve climate risk assessment.
 
+The two features we've deicded to add are additional discount rates in order to model price increase for construction and labor costs as well as a factor that multiples the cost to rebuild the house after a flood in order to model scarcity after a flood event. This will improve the climate risk assessment as it more accurately shows that magnitude of the costs associated with rebuilding the house. Under our previous model without these changes, we are likely to come to an optimal solution that is lower than what the elevation should actually be in the real world. The increased cost to rebuild in the future makes solutions using a higher elevation in year 1 more robust. 
+
 # Literature Review
 
 Provide a brief overview of the theoretical background related to your chosen feature.
@@ -75,6 +77,8 @@ Explain how these articles contribute to the justification of your selected feat
 You should make your modifications in either the `HouseElevation` or `ParkingGarage` module.
 Detail the steps taken to implement the selected feature and integrate it into the decision-support tool.
 Include code snippets and explanations where necessary to clarify the implementation process.
+
+The scarcity/demand surge feature will be added by assuming a linear relationship between the damage of the house and the demand surge magnitude. The highest value for a demand surge was found to be around 20%. Thus, if a house was damages by 50%, the demand surge will be 50% of 20%, which is 10%. This 10% will then be multiplied onto the damage that the house suffered in order to model how much more it would cost to rebuild under scarcity. For the example before, this would be 50% * (1 + 10%) = 55% damage.
 
 ## Validation
 
