@@ -10,7 +10,8 @@ Run the model for a given action and SOW
 
 Expected Annual Damages are computed using the trapezoidal rule
 """
-function run_sim(a::Action, sow::SOW, p::ModelParams)
+
+function run_sim_old(a::Action, sow::SOW, p::ModelParams)
 
     # first, we calculate the cost of elevating the house
     construction_cost = elevation_cost(p.house, a.Δh_ft)
@@ -33,13 +34,9 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
         weighted_damages = damages_frac .* pdf_values # weighted damage
         # Trapezoidal integration of weighted damages
         ead = trapz(storm_surges_ft, weighted_damages) 
-        ead 
+        ead * p.house.value_usd
     end
 
-    demand_surge = eads ./ 5
-    demand_surge = ones(length(demand_surge)) .+ demand_surge
-    eads = eads .* demand_surge
-    eads = eads .* p.house.value_usd
     years_idx = p.years .- minimum(p.years)
     discount_fracs = (1 - sow.discount_rate) .^ years_idx
     ead_npv = sum(eads .* discount_fracs)
