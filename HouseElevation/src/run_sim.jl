@@ -59,7 +59,7 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
     eads = eads .* demand_surge # multiplies eads with the demand surge factor
     eads = eads .* p.house.value_usd # converts the new damages with demand surge to usd
     years_idx = p.years .- minimum(p.years)
-    discount_fracs = (1 - hm_drs) .^ years_idx
+    discount_fracs = (1 .- hm_drs) .^ years_idx
     ead_npv = sum(eads .* discount_fracs)
     return -(ead_npv + construction_cost)
 end
