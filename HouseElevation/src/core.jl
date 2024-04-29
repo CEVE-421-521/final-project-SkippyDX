@@ -12,7 +12,8 @@ end
 struct SOW{T<:Real}
     slr::Oddo17SLR # the parameters of sea-level rise
     surge_dist::Distributions.UnivariateDistribution # the distribution of storm surge
-    discount_rate::T # the discount rate, as a percentage (e.g., 2% is 0.02)
+    st_dr::T # the housing market discount rate parameters, a tuple of shares (e.g., 2% is 0.02)
+    lt_dr::T
 end
 
 """

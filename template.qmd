@@ -178,15 +178,24 @@ function draw_surge_distribution()
     return GeneralizedExtremeValue(μ, σ, ξ)
 end
 
-function draw_discount_rate()
-    return rand(Normal(0.05, 0.03))
+function draw_hm_st_dr()
+    # Housing market short term discount rate
+    # Draw a short term rate and a long term rate so the simulation
+    # can determine the declining discount rate for the year
+
+    return rand(Uniform(0.25, 0.35))
+end
+
+function draw_hm_lt_dr()
+    return rand(Normal(0.025, 0.005))
 end
 
 function draw_sow()
     slr = rand(slr_scenarios)
     surge_params = draw_surge_distribution()
-    discount = draw_discount_rate()
-    return SOW(slr, surge_params, discount)
+    hm_st_dr = draw_hm_st_dr()
+    hm_lt_dr = draw_hm_lt_dr()
+    return SOW(slr, surge_params, hm_st_dr, hm_lt_dr)
 end
 ```
 
