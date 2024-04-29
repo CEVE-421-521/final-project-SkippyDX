@@ -53,7 +53,6 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
         ead 
     end
 
-    # NEED TO FIGURE OUT HOW TO INCLUDE HM DR FOR EACH YEAR
     demand_surge = eads ./ 5 # creates the demand surge based on house damage and 20% max surge
     demand_surge = ones(length(demand_surge)) .+ demand_surge # adds 1 to the demand surge % so it can be multiplied with the eads
     eads = eads .* demand_surge # multiplies eads with the demand surge factor
