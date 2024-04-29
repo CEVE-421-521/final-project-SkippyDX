@@ -36,10 +36,10 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
         ead 
     end
 
-    demand_surge = eads ./ 5
-    demand_surge = ones(length(demand_surge)) .+ demand_surge
-    eads = eads .* demand_surge
-    eads = eads .* p.house.value_usd
+    demand_surge = eads ./ 5 # creates the demand surge based on house damage and 20% max surge
+    demand_surge = ones(length(demand_surge)) .+ demand_surge # adds 1 to the demand surge % so it can be multiplied with the eads
+    eads = eads .* demand_surge # multiplies eads with the demand surge factor
+    eads = eads .* p.house.value_usd # converts the new damages with demand surge to usd
     years_idx = p.years .- minimum(p.years)
     discount_fracs = (1 - sow.discount_rate) .^ years_idx
     ead_npv = sum(eads .* discount_fracs)
