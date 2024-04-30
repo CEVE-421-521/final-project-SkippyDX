@@ -39,14 +39,14 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool, returnead
 
     demand_surge = eads ./ 5 # creates the demand surge based on house damage and 20% max surge
     if printtest
-        print("Demand Surge: ", eads, "\n", "\n")
+        print("EAD w/out Scarcity: ", eads, "\n", "\n")
     end
 
     demand_surge = ones(length(demand_surge)) .+ demand_surge # adds 1 to the demand surge % so it can be multiplied with the eads
     eads = eads .* demand_surge # multiplies eads with the demand surge factor
 
     if printtest
-        print("EAD: ", eads, "\n", "\n")
+        print("EAD w/ Scarcity: ", eads, "\n", "\n")
     end
 
 
