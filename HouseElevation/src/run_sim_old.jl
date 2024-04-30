@@ -11,7 +11,7 @@ Run the model for a given action and SOW
 Expected Annual Damages are computed using the trapezoidal rule
 """
 
-function run_sim_old(a::Action, sow::SOW, p::ModelParams)
+function run_sim_old(a::Action, sow::SOW, p::ModelParams, printtest::Bool)
 
     # first, we calculate the cost of elevating the house
     construction_cost = elevation_cost(p.house, a.Δh_ft)

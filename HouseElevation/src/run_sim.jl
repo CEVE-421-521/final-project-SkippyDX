@@ -10,7 +10,7 @@ Run the model for a given action and SOW
 
 Expected Annual Damages are computed using the trapezoidal rule
 """
-function run_sim(a::Action, sow::SOW, p::ModelParams)
+function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool)
     housevalue = p.house.value_usd
     house_disc = sow.house_discount
     # first, we calculate the cost of elevating the house
@@ -40,14 +40,41 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
     demand_surge = eads ./ 5 # creates the demand surge based on house damage and 20% max surge
     demand_surge = ones(length(demand_surge)) .+ demand_surge # adds 1 to the demand surge % so it can be multiplied with the eads
     eads = eads .* demand_surge # multiplies eads with the demand surge factor
-    
+    if printtest
+        print("EADs without housing value: ", eads, "\n", "\n")
+    end
+
     for n in 1:length(eads)
-    eads[n] = eads[n] * housevalue# converts the new damages with demand surge to usd
-    housevalue = housevalue * (1 + house_disc)
-    if n == 24
-        house_disc = house_disc - 0.005
+        eads[n] = eads[n] * housevalue # converts the new damages with demand surge to usd
+        housevalue = housevalue * (1 + house_disc)
+        if n == 24
+            house_disc = house_disc - 0.005
+        end
+        if n == 74
+            house_disc = house_disc - 0.005
+        end
     end
-    end
+
+    # identical as above but without a for loop and easier to print
+    # house_drs = map(p.years) do year
+    #     if n > 24
+    #         house_dr = sow.house_discount - 0.005
+
+    #     elseif n > 74
+    #         house_dr = sow.house_discount - 0.01
+    #     else house_dr = sow.house_discount
+    #     end
+    # end
+
+    # if printtest
+    #     print("Housing discount rates: ", house_drs, "\n", "\n")
+    # end
+    
+    # eads = eads .* house_drs
+
+    if printtest
+        print("EADs with housing value and discount: ", eads, "\n", "\n")
+    end 
     
     years_idx = p.years .- minimum(p.years)
     discount_fracs = (1 - sow.discount_rate) .^ years_idx
