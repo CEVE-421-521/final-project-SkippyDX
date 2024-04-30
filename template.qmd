@@ -255,7 +255,7 @@ plot(
     ylabel="NPV [1000 USD]",
     label="Old Model NPVs",
     marker=:circle,
-    title = "NPV vs. Elevation Actions using Different Model Features",
+    title = "NPV vs. Elevation Actions \nusing Different Model Features",
 )
 plot!(elevations_try, npvsnew ./ 1000; label="New Model NPVs", marker=:circle)
 plot!(elevations_try, npvsscarcity ./ 1000; label="NPVs w/ only Demand Surge", marker=:circle)
