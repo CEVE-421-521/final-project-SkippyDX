@@ -183,7 +183,37 @@ test_tuple = run_sim(Action.(1.0), first(sows), ModelParams(; house=house, years
 plot(2024:2065, last(test_tuple);
     xlabel="Year",
     ylabel="House Value [USD]",
-    title = "House Value Over Time")
+    title = "House Value Over Time\nCalculated vis 'For' Looop",
+    label = false)
+```
+
+Due to concerns about the lack of visually apparent change in house appreciation at the included 25 year 0.5% decrease, we verified the housing appreciation by running the simulated house value appreciation with both a "for" loop, above, and an explicit expression of compounding value. The results were identical.
+
+$$\[ P_t = \begin{cases}
+250000 \times (1 + 0.045)^t, & \text{if } 0 \leq t < 25 \\
+250000 \times (1 + 0.045)^{25} \times (1 + 0.04)^{t - 25}, & \text{if } 25 \leq t < 75 \\
+250000 \times (1 + 0.045)^{25} \times (1 + 0.04)^{75 - 25} \times (1 + 0.035)^{t - 75}, & \text{if } t \geq 75
+\end{cases} \]$$
+
+```{julia}
+#| echo: false
+house_drs = map(2024:2065) do year
+        if year - minimum(2024:2065) > 24
+            house_dr = (1 + 0.045) ^ 25 * (1 + 0.045-.005) ^ (year - minimum(2024:2065) - 25) 
+
+        elseif year - minimum(2024:2065) > 74
+            house_dr = (1 + 0.045) ^ 25 * (1 + 0.045-.005) ^ 75 * (1+0.045 - 0.01) ^ (year - minimum(2024:2065) -75)
+        else house_dr = (1 + 0.045) ^ (year - minimum(2024:2065))
+        end
+    end
+
+house_values = [250000 .* house_drs]
+
+plot(2024:2065, house_values;
+    xlabel="Year",
+    ylabel="House Value [USD]",
+    title = "House Value Over Time\nCalculated Directly",
+    label = false)
 ```
 
 The demand surge is calculated by taking 20% of the expected damage. This value is added to one to create a multiplier that is applied to the expected damage again to calculate the expected damage under scarcity induced by the demand surge. 
@@ -191,6 +221,8 @@ The demand surge is calculated by taking 20% of the expected damage. This value 
 This example confirms that these calculations are occurring correctly. For example, for an EAD of 0.01156077841743563 in 2030:
 
 $(0.01156077841743563 * 0.2 + 1) * 0.01156077841743563 = 0.011587508736959039$.
+
+Verifying that these two additions, scarcity and housing discount rate, were implemented as expected allows the following results to be interpreted as the outcomes of the intended alterations to the model.
 
 # Results
 

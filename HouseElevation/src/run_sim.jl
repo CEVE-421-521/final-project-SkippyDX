@@ -68,13 +68,13 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool, returnead
         end
     end
 
-    #identical as above but without a for loop and easier to print
+    # identical as above but without a for loop and easier to print
     # house_drs = map(p.years) do year
     #     if year - minimum(p.years) > 24
-    #         house_dr = (1.045) ^ 24 * (1.004) ^ (year - minimum(p.years) - 24) 
+    #         house_dr = (1 + sow.house_discount) ^ 25 * (1 + sow.house_discount-.005) ^ (year - minimum(p.years) - 25) 
 
     #     # elseif year - minimum(p.years) > 74
-    #     #     house_dr = (1 + sow.house_discount - 0.01) ^ (year - minimum(p.years)) 
+    #     #     house_dr = (1 + sow.house_discount - 0.01) ^ (year - minimum(p.years)) (1 + sow.house_discount) ^ 25 * (1 + sow.house_discount - .005) ^ 75 * (1 + sow.house_discount-.01) ^ (year - minimum(p.years) - 75) 
     #     else house_dr = (1 + sow.house_discount) ^ (year - minimum(p.years))
     #     end
     # end
@@ -94,7 +94,7 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool, returnead
     ead_npv = sum(eads .* discount_fracs)
 
     if returneads
-        return (-(ead_npv + construction_cost), housevalues )
+        return (-(ead_npv + construction_cost), housevalues)
     end
 
     return -(ead_npv + construction_cost)
