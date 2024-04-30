@@ -11,7 +11,8 @@ Run the model for a given action and SOW
 Expected Annual Damages are computed using the trapezoidal rule
 """
 function run_sim(a::Action, sow::SOW, p::ModelParams)
-
+    housevalue = p.house.value_usd
+    house_disc = sow.house_discount
     # first, we calculate the cost of elevating the house
     construction_cost = elevation_cost(p.house, a.Δh_ft)
 
@@ -39,7 +40,15 @@ function run_sim(a::Action, sow::SOW, p::ModelParams)
     demand_surge = eads ./ 5 # creates the demand surge based on house damage and 20% max surge
     demand_surge = ones(length(demand_surge)) .+ demand_surge # adds 1 to the demand surge % so it can be multiplied with the eads
     eads = eads .* demand_surge # multiplies eads with the demand surge factor
-    eads = eads .* p.house.value_usd # converts the new damages with demand surge to usd
+    
+    for n in 1:length(eads)
+    eads[n] = eads[n] * housevalue# converts the new damages with demand surge to usd
+    housevalue = housevalue * (1 + house_disc)
+    if n == 24
+        house_disc = house_disc - 0.005
+    end
+    end
+    
     years_idx = p.years .- minimum(p.years)
     discount_fracs = (1 - sow.discount_rate) .^ years_idx
     ead_npv = sum(eads .* discount_fracs)

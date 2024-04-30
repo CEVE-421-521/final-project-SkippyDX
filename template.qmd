@@ -182,11 +182,16 @@ function draw_discount_rate()
     return rand(Normal(0.05, 0.03))
 end
 
+function house_discount_rate()
+    return 0.055
+end
+
 function draw_sow()
     slr = rand(slr_scenarios)
     surge_params = draw_surge_distribution()
-    discount = draw_discount_rate()
-    return SOW(slr, surge_params, discount)
+    discount_rate = draw_discount_rate()
+    house_discount = house_discount_rate()
+    return SOW(slr, surge_params, discount_rate, house_discount)
 end
 ```
 
