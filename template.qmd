@@ -192,6 +192,8 @@ This example confirms that these calculations are occurring correctly. For examp
 
 $(0.01156077841743563 * 0.2 + 1) * 0.01156077841743563 = 0.011587508736959039$.
 
+These simplified examples of the values resulting from the implementation of expected damage given scarcity and house value appreciation indicate that the additions to the simulation are operating as intended.
+
 # Results
 
 This cell created a vector of NPVs at each elevation. Three other nearly identical cells are also used to run the other functions using different implemented features
@@ -269,6 +271,8 @@ The graph above shows the NPV vs. Elevation for 4 different models: the old mode
 As seen from our results, the two implemented features significantly decrease the NPV at each elevation, showing that our old model was underestimating the construction costs by nearly a factor of 3 at some elevations. Furthermore, the features significantly reduced the robustness of lower elevations as the damages that those actions do suffer from matter much more with the cost of reconstruction increasing. While an optimal elevation action was not found for our new model due to the max elevation action being 14ft, the general trend in our NPV vs. Elevation graph shows that an optimal solution can eventually be found at a higher elevation. This trend supports our expectation at the beginning of the project that these features would favor higher elevations that are subject to little or no damages from flooding. These findings are important in the context of climate risk management as significantly underestimating factors that play into the NPV can have catastrophic consequences with unexpected repair costs if actions are taken based on this decision support tool. 
 
 Some limitations of our model are that the house value still does not accurately capture the construction costs for the house. While the assumption that the house value is directly related to construction costs is used in both our old and new model, part of that value also includes items which do not necessarily need to be repaired, such as the land, or location positively influencing house price. Finding a method to separate the value of the physical house from other factors may be useful to implement in the future. Furthermore, due to how construction costs significantly change over time, this model may greatly benefit from the inclusion of sequential decisions as lower elevation actions can be taken while the house value is low, and higher elevations actions taken in later years when construction costs matter more. If implemented, though, it may be useful to model the increased cost associated with elevating a house in later years. 
+
+Finally, looking at each feature individually, we see that the demand surge has little effect on the NPV. This makes sense as many of our EAD values, such as the ones used in the validation are very low, and would result in a low scarcity factor. The main change in NPV comes from the housing market discount rate. This also makes sense as the value of the house being compounded every year will significantly increase its value, resulting in much higher construction costs. For example, the $250,000 house in our model should have a value of $3 million after the 60 year analysis period. 
 
 ## Conclusions
 
