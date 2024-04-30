@@ -41,6 +41,7 @@ execute:
 ---
 
 ```{julia}
+#| echo: false
 using CSV
 using DataFrames
 using DataFramesMeta
@@ -56,12 +57,13 @@ Plots.default(; margin=5Plots.mm)
 ```
 
 ```{julia}
+#| echo: false
+#| output: false
 using Revise
 using HouseElevation
 ```
 
 ## Problem Statement
-
 
 Clearly define the problem statement that your chosen feature aims to address.
 Explain the significance of this problem in the context of climate risk management.
@@ -107,7 +109,7 @@ The scarcity/demand surge feature will be added by assuming a linear relationshi
 
 For the housing discount rate, since we can roughly approximate the distribution of the house price index changes to be normally distributed, the expected annual increase in the house’s value can simply be modeled as 4.5% (it’s average value). In order to implement the decreased discount rate along with this, the UK’s model will be used with our housing discount rate decreasing by 0.5% at 25 years.
 
-
+In this cell, the house structure is created by defining its value, area for elevation costs, and it's height above the gauge.
 ```{julia}
 #| output: false
 house = let
@@ -122,6 +124,7 @@ end
 p = ModelParams(; house=house, years=2024:2083)
 ```
 
+Here the infastructure to make the SOWs are created. The functions shown all sample a state variable in the SOW such as, the sea level rise scenario, the storm surge distribution, the discount rate, and the housing market discount rate.
 ```{julia}
 #| output: false
 slr_scenarios = let
@@ -153,6 +156,7 @@ function draw_sow()
 end
 ```
 
+Finally, a seed is set so we can compare different runs of the model with the SOWs changing. Using the functions defined in the last cell, the SOWs are created. With these SOWs, we can run the model using the source code.
 ```{julia}
 #| output: false
 Random.seed!(421521)
@@ -163,6 +167,8 @@ sows_opt = first(sows, N_SOW_opt)
 ```
 
 ```{julia}
+#| echo: false
+#| output: false
 bounds = boxconstraints(; lb=[0.0], ub=[14.0])
 ```
 
@@ -213,6 +219,7 @@ Provide sufficient detail to demonstrate how the implemented feature addresses t
 Use the `#| output: false` and/or `#| echo: false` tags to hide code output and code cells in the final report except where showing the output (e.g.g, a plot) or the code (e.g., how you are sampling SOWs) adds value to the discussion.
 You may have multiple subsections of results, which you can create using `##`.
 
+This cell created a vector of NPVs at each elevation. Three other nearly identical cells are also used to run the other functions using different implemented features
 ```{julia}
 #| output: false
 elevations_try = 0:0.5:14
@@ -226,6 +233,7 @@ npvsnew = npvs_moore
 ```
 
 ```{julia}
+#| echo: false
 #| output: false
 elevations_try = 0:0.5:14
 actions_try = Action.(elevations_try)
@@ -238,6 +246,7 @@ npvshouse = npvs_moore
 ```
 
 ```{julia}
+#| echo: false
 #| output: false
 elevations_try = 0:0.5:14
 actions_try = Action.(elevations_try)
@@ -250,6 +259,7 @@ npvsscarcity = npvs_moore
 ```
 
 ```{julia}
+#| echo: false
 #| output: false
 elevations_try = 0:0.5:14
 actions_try = Action.(elevations_try)
@@ -259,7 +269,7 @@ npvs_moore = [
     mean([run_sim_old(a, sow, p, false, false) for sow in first(sows, N_more)]) for a in actions_try
 ]
 ```
-
+The vectors of NPVs are then plotted together in this cell.
 ```{julia}
 plot(
     elevations_try,
