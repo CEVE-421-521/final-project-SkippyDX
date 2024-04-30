@@ -10,7 +10,7 @@ Run the model for a given action and SOW
 
 Expected Annual Damages are computed using the trapezoidal rule
 """
-function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool)
+function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool, returneads::Bool)
     housevalue = p.house.value_usd
     house_disc = sow.house_discount
     # first, we calculate the cost of elevating the house
@@ -38,10 +38,15 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool)
     end
 
     demand_surge = eads ./ 5 # creates the demand surge based on house damage and 20% max surge
+    if printtest
+        print("Demand Surge: ", eads, "\n", "\n")
+    end
+
     demand_surge = ones(length(demand_surge)) .+ demand_surge # adds 1 to the demand surge % so it can be multiplied with the eads
     eads = eads .* demand_surge # multiplies eads with the demand surge factor
+
     if printtest
-        print("EADs without housing value: ", eads, "\n", "\n")
+        print("EAD: ", eads, "\n", "\n")
     end
 
     # for n in 1:length(eads)
@@ -72,18 +77,23 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool)
     end
 
     if printtest
-        print("Housing discount rates: ", house_drs, "\n", "\n")
+        print("Housing value multiplier: ", house_drs, "\n", "\n")
     end
 
     eads = eads * housevalue .* house_drs 
-
+    
     if printtest
-        print("EADs with housing value and discount: ", eads, "\n", "\n")
+        print("EAD given housing val. and discount: ", eads, "\n", "\n")
     end 
     
     years_idx = p.years .- minimum(p.years)
     discount_fracs = (1 - sow.discount_rate) .^ years_idx
     ead_npv = sum(eads .* discount_fracs)
+
+    if returneads
+        return (-(ead_npv + construction_cost), housevalue .* house_drs)
+    end
+
     return -(ead_npv + construction_cost)
 end
 
