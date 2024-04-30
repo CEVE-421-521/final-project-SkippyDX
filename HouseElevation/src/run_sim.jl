@@ -44,33 +44,38 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool)
         print("EADs without housing value: ", eads, "\n", "\n")
     end
 
-    for n in 1:length(eads)
-        eads[n] = eads[n] * housevalue # converts the new damages with demand surge to usd
-        housevalue = housevalue * (1 + house_disc)
-        if n == 24
-            house_disc = house_disc - 0.005
-        end
-        if n == 74
-            house_disc = house_disc - 0.005
-        end
-    end
+    # for n in 1:length(eads)
+    #     if printtest
+    #         print("Housing discount rates: ", house_disc, " at ", n, " years", "\n")
+    #     end
 
-    # identical as above but without a for loop and easier to print
-    # house_drs = map(p.years) do year
-    #     if n > 24
-    #         house_dr = sow.house_discount - 0.005
+    #     eads[n] = eads[n] * housevalue # converts the new damages with demand surge to usd
 
-    #     elseif n > 74
-    #         house_dr = sow.house_discount - 0.01
-    #     else house_dr = sow.house_discount
+    #     housevalue = housevalue * (1 + house_disc)
+    #     if n == 24
+    #         house_disc = house_disc - 0.005
+    #     end
+    #     if n == 74
+    #         house_disc = house_disc - 0.005
     #     end
     # end
 
-    # if printtest
-    #     print("Housing discount rates: ", house_drs, "\n", "\n")
-    # end
-    
-    # eads = eads .* house_drs
+    # identical as above but without a for loop and easier to print
+    house_drs = map(p.years) do year
+        if year - minimum(p.years) > 24
+            house_dr = (1 + sow.house_discount) ^ (year - minimum(p.years)) - 0.005
+
+        elseif year - minimum(p.years) > 74
+            house_dr = (1 + sow.house_discount) ^ (year - minimum(p.years)) - 0.01
+        else house_dr = (1 + sow.house_discount) ^ (year - minimum(p.years))
+        end
+    end
+
+    if printtest
+        print("Housing discount rates: ", house_drs, "\n", "\n")
+    end
+
+    eads = eads * housevalue .* house_drs 
 
     if printtest
         print("EADs with housing value and discount: ", eads, "\n", "\n")
