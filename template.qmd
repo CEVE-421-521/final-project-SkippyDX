@@ -49,6 +49,7 @@ using Metaheuristics
 using Plots
 using Random
 using Unitful
+using Plots.PlotMeasures
 
 Plots.default(; margin=5Plots.mm)
 ```
@@ -360,7 +361,11 @@ plot(
     ylabel="NPV [1000 USD]",
     label="First $(N_more) SOWs",
     marker=:circle,
+    title = "\nHouse Elevation NPV with House Value\nAppreciation and Post-Storm Scarcity",
+    topmargin = 9mm
 )
+
+# savefig("implementation_results.png")
 ```
 ```{julia}
 function objective_function(Δh::Vector{Float64})
@@ -439,7 +444,9 @@ test_tuple = run_sim(Action.(1.0), first(sows), ModelParams(; house=house, years
 plot(2024:2065, last(test_tuple);
     xlabel="Year",
     ylabel="House Value [USD]",
-    title = "House Value Over Time")
+    label = false,
+    title = "\nHouse Value Over Time")
+
 ```
 
 The demand surge is calculated by taking 20% of the expected damage. This value is added to one to create a multiplier that is applied to the expected damage again to calculate the expected damage under scarcity induced by the demand surge. 
