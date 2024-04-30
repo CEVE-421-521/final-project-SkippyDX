@@ -343,13 +343,21 @@ For example, for an expected actual damage share of 0.011587508736959039 in 2030
 
 $EAD = 0.011587508736959039 * 250000 * (1.045)^5 = 3772.4876436159875$.
 
-To confirm that the housing multipliers decline as intended after 25 and 75 years:
+A visual check confirms the increasing house value:
 
 ```{julia}
 #| code-overflow: wrap
 test_tuple = run_sim(Action.(1.0), first(sows), ModelParams(; house=house, years=2024:2065), false, true)
 
 
-plot(2024:2065, last(test_tuple))
+plot(2024:2065, last(test_tuple);
+    xlabel="Year",
+    ylabel="House Value [USD]",
+    title = "House Value Over Time")
 ```
 
+The demand surge is calculated by taking 20% of the expected damage. This value is added to one to create a multiplier that is applied to the expected damage again to calculate the expected damage under scarcity induced by the demand surge. 
+
+This example confirms that these calculations are occurring correctly. For example, for a demand surge of 0.01156077841743563 in 2030:
+
+$(0.01156077841743563 * 0.2 + 1) * 0.01156077841743563 = 0.011587508736959039$.

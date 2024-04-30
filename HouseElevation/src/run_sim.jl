@@ -50,40 +50,40 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool, returnead
     end
 
 
-    # housevalues = []
-    # for n in 1:length(eads)
-    #     if printtest
-    #         print("Housing discount rates: ", house_disc, " at ", n, " years", "\n")
-    #     end
+    housevalues = []
+    for n in 1:length(eads)
+        if printtest
+            print("Housing discount rates: ", house_disc, " at ", n, " years", "\n")
+        end
 
-    #     eads[n] = eads[n] * housevalue # converts the new damages with demand surge to usd
+        eads[n] = eads[n] * housevalue # converts the new damages with demand surge to usd
 
-    #     housevalue = housevalue * (1 + house_disc)
-    #     append!(housevalues, housevalue)
-    #     if n == 24
-    #         house_disc = house_disc - 0.005
-    #     end
-    #     if n == 74
-    #         house_disc = house_disc - 0.005
-    #     end
-    # end
-
-    #identical as above but without a for loop and easier to print
-    house_drs = map(p.years) do year
-        if year - minimum(p.years) > 24
-            house_dr = (1.045) ^ 24 * (1.004) ^ (year - minimum(p.years) - 24) 
-
-        # elseif year - minimum(p.years) > 74
-        #     house_dr = (1 + sow.house_discount - 0.01) ^ (year - minimum(p.years)) 
-        else house_dr = (1 + sow.house_discount) ^ (year - minimum(p.years))
+        housevalue = housevalue * (1 + house_disc)
+        push!(housevalues, housevalue)
+        if n == 24
+            house_disc = house_disc - 0.005
+        end
+        if n == 74
+            house_disc = house_disc - 0.005
         end
     end
 
-    if printtest
-        print("Housing value multiplier: ", house_drs, "\n", "\n")
-    end
+    #identical as above but without a for loop and easier to print
+    # house_drs = map(p.years) do year
+    #     if year - minimum(p.years) > 24
+    #         house_dr = (1.045) ^ 24 * (1.004) ^ (year - minimum(p.years) - 24) 
 
-    eads = eads * housevalue .* house_drs 
+    #     # elseif year - minimum(p.years) > 74
+    #     #     house_dr = (1 + sow.house_discount - 0.01) ^ (year - minimum(p.years)) 
+    #     else house_dr = (1 + sow.house_discount) ^ (year - minimum(p.years))
+    #     end
+    # end
+
+    # if printtest
+    #     print("Housing value multiplier: ", house_drs, "\n", "\n")
+    # end
+
+    # eads = eads * housevalue .* house_drs 
     
     if printtest
         print("EAD given housing val. and discount: ", eads, "\n", "\n")
@@ -94,7 +94,7 @@ function run_sim(a::Action, sow::SOW, p::ModelParams, printtest::Bool, returnead
     ead_npv = sum(eads .* discount_fracs)
 
     if returneads
-        return (-(ead_npv + construction_cost), housevalue .* house_drs)
+        return (-(ead_npv + construction_cost), housevalues )
     end
 
     return -(ead_npv + construction_cost)
