@@ -39,89 +39,6 @@ execute:
   cache: true
 ---
 
-## Problem Statement
-
-
-Clearly define the problem statement that your chosen feature aims to address.
-Explain the significance of this problem in the context of climate risk management.
-
-
-This project will improve the model's ability to estimate the price to rebuild a home after flooding by accounting for more complex aspects of discount rate and price changes based on scarcity after a flood.
-
-
-To obtain a more accurate understanding of cost over time, the discount rate will be broken down to have separate discount rates for the net present value calculation, the housing market, and the cost of labor and materials. Including these values will capture the way that different aspects of cost change over time in different ways; for example, perhaps inflation is higher for labor or materials. These factors will affect estimates of the cost to rebuild a house entirely from scratch. The discount rates, which may have different distributions or be constant, will be decided based on the findings of the literature review.
-
-
-Additionally, the model will be modified to capture how scarcity caused by a flood affects construction cost by multiplying reconstruction costs by a scarcity factor that will be decided after the literature review. These factors are significant as our current model has the value of the house be static even after 60 years, which is unrealistic. This makes us vulnerable to underestimating the cost to rebuild the house in the future, possibly making low elevations optimal compared to higher elevations. With more accurate construction costs, we should have less of an issue with overestimating the NPV at different elevations.
-
-
-The components added to the model are illustrated in Figure 1.
-
-
-<!-- ![housing_cost_pipeline](house_cost_pipeline.png){width=80%} -->
-
-
-
-
-
-
-## Selected Feature
-
-Describe the feature you have selected to add to the existing decision-support tool.
-Discuss how this feature relates to the problem statement and its potential to improve climate risk assessment.
-
-The two features we've decided to add are additional discount rates in order to model price increase for construction and labor costs as well as a factor that multiplies the cost to rebuild the house in order to model scarcity after a flood event. This will improve the climate risk assessment as it more accurately shows the magnitude of the costs associated with rebuilding the house. Under our previous model without these changes, we are likely to come to an optimal solution that is lower than what the elevation should actually be in the real world. The increased cost to rebuild in the future may make solutions using a higher elevation in year 1 more robust.
-
-# Literature Review
-
-Provide a brief overview of the theoretical background related to your chosen feature.
-Cite at least two relevant journal articles to support your approach (see [Quarto docs](https://quarto.org/docs/authoring/footnotes-and-citations.html) for help with citations).
-Explain how these articles contribute to the justification of your selected feature.
-
-The majority of articles refer to construction cost increases after natural disasters as “demand surges”. While many factors are theorized to play into demand surges, such as increased labor costs, material costs, etc., there is little consensus of how these factors quantitatively play into the magnitude of the demand surge following a hazard. Despite the lack of formal consensus on the topic, demand surge can still be approximately modeled based on historical data and basing our assumptions from previous research. For example, the paper with the highest claimed demand surge was 20%. From this, we can make assumptions about our boundaries for the demand surge with it ranging from 0-20%. Further research on the topic has also shown there is a correlation between hazard magnitude and labor costs in East Coast states during hurricane season. Interestly, though, there was no significant correlation between the hazard and materials cost. Regardless of that finding, though, this paper shows a possible correlation between the hazard’s magnitude and a factor that plays into demand surge. Using these findings, we can build our model to be a function where the input is the magnitude of the hazard and the output is the demand surge. Finally, previous research articles have included models for demand surge using a linear relationship. Copying this method can complete the function discussed previously, as our relationship between hazard magnitude and demand surge can simply be modeled as a linear relationship too.
-
-# Methodology
-
-## Implementation
-
-You should make your modifications in either the `HouseElevation` or `ParkingGarage` module.
-Detail the steps taken to implement the selected feature and integrate it into the decision-support tool.
-Include code snippets and explanations where necessary to clarify the implementation process.
-
-The scarcity/demand surge feature will be added by assuming a linear relationship between the damage of the house and the demand surge magnitude. The highest value for a demand surge was found to be around 20%. Thus, if a house was damaged by 50%, the demand surge will be 50% of 20%, which is 10%. This 10% will then be multiplied onto the damage that the house suffered in order to model how much more it would cost to rebuild under scarcity. For the example before, this would be 50% * (1 + 10%) = 55% damage.
-
-## Validation
-
-As we have seen in labs, mistakes are inevitable and can lead to misleading results.
-To minimize the risk of errors making their way into final results, it is essential to validate the implemented feature.
-Describe the validation techniques used to ensure the accuracy and reliability of your implemented feature.
-Discuss any challenges faced during the validation process and how they were addressed.
-
-# Results
-
-Present the results obtained from the enhanced decision-support tool.
-Use tables, figures, and visualizations to clearly communicate the outcomes.
-Provide sufficient detail to demonstrate how the implemented feature addresses the problem statement.
-Use the `#| output: false` and/or `#| echo: false` tags to hide code output and code cells in the final report except where showing the output (e.g.g, a plot) or the code (e.g., how you are sampling SOWs) adds value to the discussion.
-You may have multiple subsections of results, which you can create using `##`.
-
-# Conclusions
-
-## Discussion
-
-Analyze the implications of your results for climate risk management.
-Consider the context of the class themes and discuss how your findings contribute to the understanding of climate risk assessment.
-Identify any limitations of your approach and suggest potential improvements for future work.
-
-## Conclusions
-
-Summarize the key findings of your project and reiterate the significance of your implemented feature in addressing the problem statement.
-Discuss the broader implications of your work for climate risk management and the potential for further research in this area.
-
-# References
-
-:::{#refs}
-:::
 ```{julia}
 using CSV
 using DataFrames
@@ -136,17 +53,58 @@ using Unitful
 Plots.default(; margin=5Plots.mm)
 ```
 
-We also load our local package as in lab 5.
-
 ```{julia}
 using Revise
 using HouseElevation
 ```
 
-# States of the world
+## Problem Statement
 
-We begin by defining the variables that don't change from one SOW to the next.
-We load these into the `ModelParams`.
+
+Clearly define the problem statement that your chosen feature aims to address.
+Explain the significance of this problem in the context of climate risk management.
+
+Currently, our model bases the cost of reconstructing the house each year based on the current value of the house. In the real world, however, house prices have consistently risen with an average appreciation rate of about 4.5% annually in the United States. Furthermore, our model fails to capture the increased cost of construction due to scarcity after a natural disaster. These two missing features may lead to our model greatly underestimating the cost of reconstruction in future years as a $100k construction job now may cost millions in the future. This discrepancy may lead to our model favoring lower elevations than higher ones, raising the vulnerability of houses which use this decision support tool when elevating their house against flood events. 
+
+## Selected Feature
+
+Describe the feature you have selected to add to the existing decision-support tool.
+Discuss how this feature relates to the problem statement and its potential to improve climate risk assessment.
+
+The two features added to the model are a scarcity factor as well as a housing market discount rate. The housing market discount rate will represent the rate at which the value of the house increases per year. By multiplying the value of the house by this rate each year, the model will be able to more accurately capture the actual cost of reconstruction at later years where our house may be worth millions more. However, uncertainty in the housing market and the possibility of our house’s value ballooning and diluting the influence early years’ NPVs have may have us look into decreasing discount rates for this feature.
+
+The scarcity factor will raise the cost of reconstruction further by multiplying it with the annual damages. This factor will change between SOW’s and will likely depend on the magnitude of the flood event in order to differentiate scarcity during low damage and high damage flooding events. 
+
+
+# Literature Review
+
+Provide a brief overview of the theoretical background related to your chosen feature.
+Cite at least two relevant journal articles to support your approach (see [Quarto docs](https://quarto.org/docs/authoring/footnotes-and-citations.html) for help with citations).
+Explain how these articles contribute to the justification of your selected feature.
+
+The majority of articles refer to construction cost increases after natural disasters as “demand surges”. While many factors are theorized to play into demand surges, such as increased labor costs, material costs, etc., there is little consensus of how these factors quantitatively play into the value of the demand surge following a hazard (Olesen et. al., 2011). Despite the lack of formal consensus on the topic, though, demand surge can still be approximately modeled based on historical data and basing our assumptions on previous research. For example, the paper with the highest claimed demand surge was 20% (Olesen et. al., 2011). From this, we can make assumptions about our boundaries for the demand surge with it ranging from 0-20%. Further research on this topic has also shown that there is a correlation between hazard magnitude and labor costs in East Coast states during hurricane season, a factor commonly known to influence demand surges (Olsen et. al., 2013). Using these findings, we can build our model to be a function where the input is the intensity of the hazard and the output is the demand surge. Finally, previous articles have included models for demand surge using a linear relationship (Olsen et. al., 2013). Copying this method can complete the function discussed previously, as our relationship between hazard intensity and demand surge can simply be modeled as a linear relationship too.
+
+The current average housing market discount rate based on the average % increase in the US house price index is 4.5% (FRED, 2024). As seen in the histogram below, the values for these discount rates each year are approximately normally distributed, which means our expected discount rate for housing will also be its average. Compounding the value of our house by 4.5% each year, though, may create an effect where earlier years, where the value of the house is low, may have low influence on the NPV compared to higher years. Looking at articles concerning a decreasing discount rate, many have referenced France and the United Kingdom’s governments use of a decreasing discount rate where it is periodically decreased based on prior calculations (Cropper et. al., 2014). A similar method can be employed here, where after a set amount of time during our 60 analysis period, the 4.5% discount rate drops.
+
+![](PriceDist.png)
+              
+Figure 1: Distribution of House Price Increases
+
+![](UKDR.png)
+Figure 2: United Kingdom Social Decreasing Discount Rate 
+
+# Methodology
+
+## Implementation
+
+You should make your modifications in either the `HouseElevation` or `ParkingGarage` module.
+Detail the steps taken to implement the selected feature and integrate it into the decision-support tool.
+Include code snippets and explanations where necessary to clarify the implementation process.
+
+The scarcity/demand surge feature will be added by assuming a linear relationship between the damage of the house and the demand surge magnitude. The highest value for a demand surge was found to be around 20%. Thus, if a house was damaged by 50%, the demand surge will be 50% of 20%, which is 10%. This 10% will then be multiplied unto the damage that the house suffered in order to model how much more it would cost to rebuild under scarcity. For the example before, this would be 50% * (1 + 10%) = 55% damage.
+
+For the housing discount rate, since we can roughly approximate the distribution of the house price index changes to be normally distributed, the expected annual increase in the house’s value can simply be modeled as 4.5% (it’s average value). In order to implement the decreased discount rate along with this, the UK’s model will be used with our housing discount rate decreasing by 0.5% at 25 years.
+
 
 ```{julia}
 #| output: false
@@ -161,8 +119,6 @@ end
 
 p = ModelParams(; house=house, years=2024:2083)
 ```
-
-Next we define how we will sample the states of the world.
 
 ```{julia}
 #| output: false
@@ -195,8 +151,6 @@ function draw_sow()
 end
 ```
 
-Finally we can sample the SOWs
-
 ```{julia}
 #| output: false
 Random.seed!(421521)
@@ -206,18 +160,150 @@ sows = [draw_sow() for _ in 1:N_SOW]
 sows_opt = first(sows, N_SOW_opt)
 ```
 
-# Optimization
-
-## Bounds
-
-We have a single decision variable, the height of the house above the ground.
-This can be any real number between 0 and 14 feet.
-
 ```{julia}
 bounds = boxconstraints(; lb=[0.0], ub=[14.0])
 ```
 
-## Objective function
+## Validation
+
+As we have seen in labs, mistakes are inevitable and can lead to misleading results.
+To minimize the risk of errors making their way into final results, it is essential to validate the implemented feature.
+Describe the validation techniques used to ensure the accuracy and reliability of your implemented feature.
+Discuss any challenges faced during the validation process and how they were addressed.
+
+To confirm that the implementation of the housing discount rate is taking place as expected, we look at one randomly sampled state of the world and a select few years. The expected actual damages computed as a function of the sampled sea level rise, sampled storm surge distribution, and housing characteristics that do not change are shown. 
+
+The the expected actual damages calculated based on one possible state of the world and the same fixed house characteristics used in the full implementation are shown with one action option of elevating the house 1 foot in a limited number of possible years. The housing multiplier for each year, which takes into account a housing "discount rate" that describes the housing value appreciation rate, estimated here as 4.5%, is also shown. Because the housing value increased by 4.5% each year, the multiplier is continuously compounding. Next, the expected actual damage calculated for each year for a house of the given value, $250,000, is shown. These values confirm that the calculations are taking place as intended.
+
+```{julia}
+#| code-overflow: wrap
+run_sim(Action.(1.0), first(sows), ModelParams(; house=house, years=[2024, 2030]), true, false)
+```
+
+For example, for an expected actual damage share of 0.011587508736959039 in 2030,
+
+$EAD = 0.011587508736959039 * 250000 * (1.045)^5 = 3772.4876436159875$.
+
+A visual check confirms the increasing house value:
+
+```{julia}
+#| code-overflow: wrap
+test_tuple = run_sim(Action.(1.0), first(sows), ModelParams(; house=house, years=2024:2065), false, true)
+
+
+plot(2024:2065, last(test_tuple);
+    xlabel="Year",
+    ylabel="House Value [USD]",
+    title = "House Value Over Time")
+```
+
+The demand surge is calculated by taking 20% of the expected damage. This value is added to one to create a multiplier that is applied to the expected damage again to calculate the expected damage under scarcity induced by the demand surge. 
+
+This example confirms that these calculations are occurring correctly. For example, for a demand surge of 0.01156077841743563 in 2030:
+
+$(0.01156077841743563 * 0.2 + 1) * 0.01156077841743563 = 0.011587508736959039$.
+
+# Results
+
+Present the results obtained from the enhanced decision-support tool.
+Use tables, figures, and visualizations to clearly communicate the outcomes.
+Provide sufficient detail to demonstrate how the implemented feature addresses the problem statement.
+Use the `#| output: false` and/or `#| echo: false` tags to hide code output and code cells in the final report except where showing the output (e.g.g, a plot) or the code (e.g., how you are sampling SOWs) adds value to the discussion.
+You may have multiple subsections of results, which you can create using `##`.
+
+```{julia}
+#| output: false
+elevations_try = 0:0.5:14
+actions_try = Action.(elevations_try)
+
+N_more = 500
+npvs_moore = [
+    mean([run_sim(a, sow, p, false, false) for sow in first(sows, N_more)]) for a in actions_try
+]
+npvsnew = npvs_moore
+```
+
+```{julia}
+#| output: false
+elevations_try = 0:0.5:14
+actions_try = Action.(elevations_try)
+
+N_more = 500
+npvs_moore = [
+    mean([run_sim_house(a, sow, p, false, false) for sow in first(sows, N_more)]) for a in actions_try
+]
+npvshouse = npvs_moore
+```
+
+```{julia}
+#| output: false
+elevations_try = 0:0.5:14
+actions_try = Action.(elevations_try)
+
+N_more = 500
+npvs_moore = [
+    mean([run_sim_scarcity(a, sow, p, false, false) for sow in first(sows, N_more)]) for a in actions_try
+]
+npvsscarcity = npvs_moore
+```
+
+```{julia}
+#| output: false
+elevations_try = 0:0.5:14
+actions_try = Action.(elevations_try)
+
+N_more = 500
+npvs_moore = [
+    mean([run_sim_old(a, sow, p, false, false) for sow in first(sows, N_more)]) for a in actions_try
+]
+```
+
+```{julia}
+plot(
+    elevations_try,
+    npvs_moore ./ 1000;
+    xlabel="Elevation [ft]",
+    ylabel="NPV [1000 USD]",
+    label="Old Model NPVs",
+    marker=:circle,
+    title = "NPV vs. Elevation Actions using Different Model Features",
+)
+plot!(elevations_try, npvsnew ./ 1000; label="New Model NPVs", marker=:circle)
+plot!(elevations_try, npvsscarcity ./ 1000; label="NPVs w/ only Demand Surge", marker=:circle)
+plot!(elevations_try, npvshouse ./ 1000; label="NPVs w/ only House Value Increase", marker=:circle)
+```
+
+The graph above shows the NPV vs. Elevation for 4 different models: the old model with no features, models using only the demand surge feature and housing market discount rate feature, and both features. 
+
+# Conclusions
+
+## Discussion
+
+Analyze the implications of your results for climate risk management.
+Consider the context of the class themes and discuss how your findings contribute to the understanding of climate risk assessment.
+Identify any limitations of your approach and suggest potential improvements for future work.
+
+As seen from our results, the two implemented features significantly decrease the NPV at each elevation, showing that our old model was underestimating the construction costs by nearly a factor of 3 at some elevations. Furthermore, the features significantly reduced the robustness of lower elevations as the damages that those actions do suffer from matter much more with the cost of reconstruction increasing. While an optimal elevation action was not found for our new model due to the max elevation action being 14ft, the general trend in our NPV vs. Elevation graph shows that an optimal solution can eventually be found at a higher elevation. This trend supports our expectation at the beginning of the project that these features would favor higher elevations that are subject to little or no damages from flooding. These findings are important in the context of climate risk management as significantly underestimating factors that play into the NPV can have catastrophic consequences with unexpected repair costs if actions are taken based on this decision support tool. 
+
+Some limitations of our model are that the house value still does not accurately capture the construction costs for the house. While the assumption that the house value is directly related to construction costs is used in both our old and new model, part of that value also includes items which do not necessarily need to be repaired, such as the land, or location positively influencing house price. Finding a method to separate the value of the physical house from other factors may be useful to implement in the future. Furthermore, due to how construction costs significantly change over time, this model may greatly benefit from the inclusion of sequential decisions as lower elevation actions can be taken while the house value is low, and higher elevations actions taken in later years when construction costs matter more. If implemented, though, it may be useful to model the increased cost associated with elevating a house in later years. 
+
+## Conclusions
+
+Summarize the key findings of your project and reiterate the significance of your implemented feature in addressing the problem statement.
+Discuss the broader implications of your work for climate risk management and the potential for further research in this area.
+
+Our implemented features successfully solve the issue posed in the problem statement. The issue of rising house prices not being fully captured is solved by the inclusion of a housing discount rate that increases the value of our house each year. Furthermore, the issue of scarcity is also fixed by creating a demand surge factor based on the intensity of the flood hazard that further increases the cost to repair the house each year. These features both work to change the magnitude of construction costs at different elevations, raising the optimal elevation significantly.
+
+These findings implicate that models which fail to capture the changing cost of construction over time may be significantly underestimating the optimal elevation for a house. This is particularly concerning as in the context of climate risk management, as overestimating precautions is often better than underestimating them, especially when the safety of people, such as the homeowners, are at stake. Using these features, homeowners can make a more informed decision when elevating their house so that they do not find themselves in a situation where there are more repair costs than originally anticipated. Further research in this area could analyze the possible factors that play into a demand surge and furthering a consensus on a concrete definition for it. Quantitative analysis for the demand surge would greatly benefit climate risk management models as many costs aside the house repairs will generally also be raised due to scarcity following a natural disaster.
+
+
+# References
+
+:::{#refs}
+:::
+
+
+<!-- ## Objective function
 
 We next need an objective function.
 Recall that we want to _maximize_ NPV, but the optimization package we are using is set up to _minimize_.
@@ -360,4 +446,4 @@ The demand surge is calculated by taking 20% of the expected damage. This value 
 
 This example confirms that these calculations are occurring correctly. For example, for a demand surge of 0.01156077841743563 in 2030:
 
-$(0.01156077841743563 * 0.2 + 1) * 0.01156077841743563 = 0.011587508736959039$.
+$(0.01156077841743563 * 0.2 + 1) * 0.01156077841743563 = 0.011587508736959039$. -->
